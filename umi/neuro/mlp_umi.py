@@ -22,7 +22,7 @@ class MlpUmi(UnifiedModelInterface):
         self.callbacks = callbacks or []
 
     @staticmethod
-    def _construct_network(layer_sizes: List[int], objective: Objective, class_num: Optional[int],
+    def _build_network(layer_sizes: List[int], objective: Objective, class_num: Optional[int],
                            activation: str, reg_fun: Callable[[int], Optional[Regularizer]], compile_args: dict):
         if objective == Objective.CLASSIFICATION and class_num is None:
             raise ValueError("Mlp classifier requires class_num")
