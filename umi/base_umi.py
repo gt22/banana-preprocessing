@@ -35,7 +35,8 @@ class UnifiedModelInterface(ABC):
 
     @abstractmethod
     def save(self, fold_dir, **kwargs):
-        os.makedirs(fold_dir)
+        if not os.path.exists(fold_dir):
+            os.makedirs(fold_dir)
 
     @abstractmethod
     def on_train_end(self, **kwargs):
