@@ -69,7 +69,7 @@ class MlpUmi(UnifiedModelInterface):
 
     def predict_proba(self, x, **kwargs):
         if self.objective != Objective.CLASSIFICATION:
-            raise ValueError("predict_proba for MLP models works only for classification")
+            raise NotImplementedError("predict_proba for MLP models works only for classification")
         pred = self.model.predict_proba(x, **kwargs)
         if self.class_num == 2:
             return pred[:, 0]

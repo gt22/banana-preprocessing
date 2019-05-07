@@ -5,7 +5,6 @@ import os
 
 
 class SklearnUMI(UnifiedModelInterface):
-
     model: Any
 
     def __init__(self, model, model_name: str, class_num: Optional[int] = None,
@@ -25,24 +24,22 @@ class SklearnUMI(UnifiedModelInterface):
             elif et == 'regressor':
                 return Objective.REGRESSION
             else:
-                raise ValueError(f"Unknown _estimator_type '{et}', likely this model won't work with UMI."
-                                 f" Specify objective explicitly to try anyway.")
+                raise NotImplementedError(f"Unknown _estimator_type '{et}', likely this model won't work with UMI."
+                                          f" Specify objective explicitly to try anyway.")
         else:
             raise ValueError(f"Couldn't find '_estimator_type' for {model}, please specify objective explicitly")
 
     def fit(self, x_train, y_train, x_val=None, y_val=None, **kwargs):
         if hasattr(self.model, 'fit'):
-            # noinspection PyUnresolvedReferences
             return self.model.fit(x_train, y_train)
         else:
-            raise ValueError(f"Couldn't find 'fit' method on {self.model}, are you sure this is a model?")
+            raise NotImplementedError(f"Couldn't find 'fit' method on {self.model}, are you sure this is a model?")
 
     def predict(self, x, **kwargs):
         if hasattr(self.model, 'predict'):
-            # noinspection PyUnresolvedReferences
             return self.model.predict(x)
         else:
-            raise ValueError(f"Couldn't find 'predict' method on {self.model}, are you sure this is a model?")
+            raise NotImplementedError(f"Couldn't find 'predict' method on {self.model}, are you sure this is a model?")
 
     def predict_proba(self, x, **kwargs):
         if hasattr(self.model, 'predict_proba'):
@@ -51,12 +48,10 @@ class SklearnUMI(UnifiedModelInterface):
                 pred = pred[:, 1]
             return pred
         else:
-            if self.objective == Objective.CLASSIFICATION:
-                raise ValueError(f"Couldn't find 'predict_proba' method on {self.model}, "
-                                 f"are you sure this is classification model?")
-            else:
-                raise ValueError(f"Couldn't find 'predict_proba' method on {self.model}, "
-                                 f"this method is usually only present for classification models")
+            raise NotImplementedError(f"Couldn't find 'predict_proba' method on {self.model}, " +
+                                      f"are you sure this is classification model?"
+                                      if self.objective == Objective.CLASSIFICATION
+                                      else f"this method is usually only present for classification models")
 
     def save(self, fold_dir, **kwargs):
         super().save(fold_dir)
