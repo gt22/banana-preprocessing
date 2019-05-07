@@ -22,7 +22,7 @@ class CatboostUMI(UnifiedModelInterface):
         elif isinstance(model, CatBoostClassifier):
             return Objective.CLASSIFICATION
         else:
-            raise ValueError(f"Unknown LGBM model {model}, likely it won't work with UMI."
+            raise ValueError(f"Unknown Catboost model {model}, likely it won't work with UMI."
                              f" Specify objective explicitly to try anyway.")
 
     def fit(self, x_train, y_train, x_val, y_val, **kwargs):
