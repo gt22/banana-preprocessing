@@ -9,7 +9,6 @@ from keras.callbacks import Callback
 
 
 class MlpUmi(UnifiedModelInterface):
-
     model: Sequential
     callbacks: List[Callback]
 
@@ -23,7 +22,7 @@ class MlpUmi(UnifiedModelInterface):
 
     @staticmethod
     def _build_network(layer_sizes: List[int], objective: Objective, class_num: Optional[int],
-                           activation: str, reg_fun: Callable[[int], Optional[Regularizer]], compile_args: dict):
+                       activation: str, reg_fun: Callable[[int], Optional[Regularizer]], compile_args: dict):
         if objective == Objective.CLASSIFICATION and class_num is None:
             raise ValueError("Mlp classifier requires class_num")
         nn = Sequential()
@@ -66,7 +65,7 @@ class MlpUmi(UnifiedModelInterface):
         return self.model.predict_proba(x, **kwargs)
 
     def save(self, fold_dir, **kwargs):
-        super().save()
+        super().save(fold_dir)
         save_model(self.model, os.path.join(fold_dir, f'{self.model_name}.h5'))
 
     def on_train_end(self, **kwargs):
