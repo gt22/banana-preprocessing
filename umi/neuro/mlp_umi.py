@@ -18,7 +18,7 @@ class MlpUmi(UnifiedModelInterface):
                  reg_fun: Callable[[int], Optional[Regularizer]] = lambda x: None,
                  compile_args: Optional[dict] = None, callbacks: Optional[List[Callback]] = None):
         super().__init__(objective, model_name, class_num)
-        self.model = self._construct_network(layer_sizes, objective, class_num, activation, reg_fun, compile_args or {})
+        self.model = self._build_network(layer_sizes, objective, class_num, activation, reg_fun, compile_args or {})
         self.callbacks = callbacks or []
 
     @staticmethod
