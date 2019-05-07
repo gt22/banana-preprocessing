@@ -1,14 +1,14 @@
-from sklearn.base import BaseEstimator
 from umi.base_umi import UnifiedModelInterface, Objective
-from typing import Optional
+from typing import Optional, Any
 import pickle
 import os
 
 
 class SklearnUMI(UnifiedModelInterface):
-    model: BaseEstimator
 
-    def __init__(self, model: BaseEstimator, model_name: str, class_num: Optional[int] = None,
+    model: Any
+
+    def __init__(self, model, model_name: str, class_num: Optional[int] = None,
                  objective: Optional[Objective] = None):
         if objective is None:
             objective = self._get_objective_from_model(model)
@@ -46,8 +46,10 @@ class SklearnUMI(UnifiedModelInterface):
 
     def predict_proba(self, x, **kwargs):
         if hasattr(self.model, 'predict_proba'):
-            # noinspection PyUnresolvedReferences
-            return self.model.predict_proba(x)
+            pred = self.model.predict_proba(x)
+            if self.objective == Objective.CLASSIFICATION and pred.shape[1] == 2:
+                pred = pred[:, 1]
+            return pred
         else:
             if self.objective == Objective.CLASSIFICATION:
                 raise ValueError(f"Couldn't find 'predict_proba' method on {self.model}, "

@@ -6,6 +6,7 @@ from keras.layers import Dense
 from keras import backend as K
 from keras.regularizers import Regularizer
 from keras.callbacks import Callback
+import numpy as np
 
 
 class MlpUmi(UnifiedModelInterface):
@@ -57,12 +58,23 @@ class MlpUmi(UnifiedModelInterface):
         return self.model.fit(x_train, y_train, validation_data=(x_val, y_val) if x_val is not None else None, **kwargs)
 
     def predict(self, x, **kwargs):
-        return self.model.predict(x, **kwargs)
+        pred = self.model.predict(x, **kwargs)
+        if self.objective == Objective.REGRESSION:
+            return pred[:, 0]
+        elif self.objective == Objective.CLASSIFICATION:
+            if self.class_num == 2:
+                return np.int_(pred[:, 0] > 0.5)
+            else:
+                return np.argmax(pred, axis=1)
 
     def predict_proba(self, x, **kwargs):
         if self.objective != Objective.CLASSIFICATION:
             raise ValueError("predict_proba for MLP models works only for classification")
-        return self.model.predict_proba(x, **kwargs)
+        pred = self.model.predict_proba(x, **kwargs)
+        if self.class_num == 2:
+            return pred[:, 0]
+        else:
+            return pred
 
     def save(self, fold_dir, **kwargs):
         super().save(fold_dir)

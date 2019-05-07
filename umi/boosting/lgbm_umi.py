@@ -1,52 +1,15 @@
 from lightgbm import LGBMModel, LGBMClassifier, LGBMRegressor
-from umi.base_umi import UnifiedModelInterface, Objective
-from typing import Optional
-import pickle
-import os
+from umi.base_umi import Objective
+from umi.boosting.boosting_umi import BoostingUMI
 
 
-class LgbUMI(UnifiedModelInterface):
+class LgbUMI(BoostingUMI):
     model: LGBMModel
 
-    def __init__(self, model: LGBMModel, model_name: str, class_num: Optional[int] = None,
-                 objective: Optional[Objective] = None):
-        if objective is None:
-            objective = self._get_objective_from_model(model)
-        super().__init__(objective, model_name, class_num)
-        self.model = model
-
-    @staticmethod
-    def _get_objective_from_model(model: LGBMModel):
-        if isinstance(model, LGBMRegressor):
-            return Objective.REGRESSION
-        elif isinstance(model, LGBMClassifier):
-            return Objective.CLASSIFICATION
+    def _get_model_from_objective(self, objective: Objective, model_args: dict) -> LGBMModel:
+        if objective == Objective.CLASSIFICATION:
+            return LGBMClassifier(**model_args)
+        elif objective == Objective.REGRESSION:
+            return LGBMRegressor(**model_args)
         else:
-            raise ValueError(f"Unknown LGBM model {model}, likely it won't work with UMI."
-                             f" Specify objective explicitly to try anyway.")
-
-    def fit(self, x_train, y_train, x_val, y_val, **kwargs):
-        return self.model.fit(x_train, y_train, eval_set=(x_val, y_val) if x_val is not None else None, **kwargs)
-
-    def predict(self, x, **kwargs):
-        return self.model.predict(x, **kwargs)
-
-    def predict_proba(self, x, **kwargs):
-        if hasattr(self.model, 'predict_proba'):
-            # noinspection PyUnresolvedReferences
-            return self.model.predict_proba(x, **kwargs)
-        else:
-            if self.objective == Objective.CLASSIFICATION:
-                raise ValueError(f"Couldn't find 'predict_proba' method on {self.model}, "
-                                 f"are you sure this is classification model?")
-            else:
-                raise ValueError(f"Couldn't find 'predict_proba' method on {self.model}, "
-                                 f"this method is usually only present for classification models")
-
-    def save(self, fold_dir, **kwargs):
-        super().save(fold_dir)
-        with open(os.path.join(fold_dir, f'{self.model_name}.pickle'), 'wb') as f:
-            pickle.dump(self.model, f)
-
-    def on_train_end(self):
-        del self.model
+            raise NotImplementedError("Unknown objective")

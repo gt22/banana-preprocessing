@@ -1,53 +1,17 @@
 from xgboost import XGBModel, XGBClassifier, XGBRegressor
-from umi.base_umi import UnifiedModelInterface, Objective
-from typing import Optional
-import pickle
-import os
+from umi.base_umi import Objective
+from umi.boosting.boosting_umi import BoostingUMI
 
 
-class XgbUMI(UnifiedModelInterface):
+class XgbUMI(BoostingUMI):
 
     model: XGBModel
 
-    def __init__(self, model: XGBModel, model_name: str, class_num: Optional[int] = None,
-                 objective: Optional[Objective] = None):
-        if objective is None:
-            objective = self._get_objective_from_model(model)
-        super().__init__(objective, model_name, class_num)
-        self.model = model
-
-    @staticmethod
-    def _get_objective_from_model(model: XGBModel):
-        if isinstance(model, XGBRegressor):
-            return Objective.REGRESSION
-        elif isinstance(model, XGBClassifier):
-            return Objective.CLASSIFICATION
+    def _get_model_from_objective(self, objective: Objective, model_args: dict) -> XGBModel:
+        if objective == Objective.CLASSIFICATION:
+            return XGBClassifier(**model_args)
+        elif objective == Objective.REGRESSION:
+            return XGBRegressor(**model_args)
         else:
-            raise ValueError(f"Unknown XGB model {model}, likely it won't work with UMI."
-                             f" Specify objective explicitly to try anyway.")
+            raise NotImplementedError("Unknown objective")
 
-    def fit(self, x_train, y_train, x_val, y_val, **kwargs):
-        return self.model.fit(x_train, y_train, eval_set=(x_val, y_val) if x_val is not None else None, **kwargs)
-
-    def predict(self, x, **kwargs):
-        return self.model.predict(x, **kwargs)
-
-    def predict_proba(self, x, **kwargs):
-        if hasattr(self.model, 'predict_proba'):
-            # noinspection PyUnresolvedReferences
-            return self.model.predict_proba(x, **kwargs)
-        else:
-            if self.objective == Objective.CLASSIFICATION:
-                raise ValueError(f"Couldn't find 'predict_proba' method on {self.model}, "
-                                 f"are you sure this is classification model?")
-            else:
-                raise ValueError(f"Couldn't find 'predict_proba' method on {self.model}, "
-                                 f"this method is usually only present for classification models")
-
-    def save(self, fold_dir, **kwargs):
-        super().save(fold_dir)
-        with open(os.path.join(fold_dir, f'{self.model_name}.pickle'), 'wb') as f:
-            pickle.dump(self.model, f)
-
-    def on_train_end(self):
-        del self.model
