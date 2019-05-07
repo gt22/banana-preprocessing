@@ -45,7 +45,8 @@ class CatboostUMI(UnifiedModelInterface):
 
     def save(self, fold_dir, **kwargs):
         super().save(fold_dir)
-        pickle.dump(self.model, os.path.join(fold_dir, f'{self.model_name}.pickle'))
+        with open(os.path.join(fold_dir, f'{self.model_name}.pickle'), 'wb') as f:
+            pickle.dump(self.model, f)
 
     def on_train_end(self):
         del self.model
