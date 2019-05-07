@@ -18,7 +18,7 @@ class MlpUmi(UnifiedModelInterface):
                  compile_args: Optional[dict] = None, callbacks: Optional[List[Callback]] = None):
         super().__init__(objective, model_name, class_num)
         self.model = self._build_network(layer_sizes, objective, class_num, activation, reg_fun, compile_args or {})
-        self.callbacks = callbacks or []
+        self.callbacks = callbacks if callbacks is not None else []
 
     @staticmethod
     def _build_network(layer_sizes: List[int], objective: Objective, class_num: Optional[int],
