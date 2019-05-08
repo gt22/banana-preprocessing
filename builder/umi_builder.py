@@ -1,6 +1,6 @@
 from umi.base_umi import Objective, UnifiedModelInterface
 from typing import Dict, Callable
-
+from umi.sklearn_models import known_models as known_sklearn_models
 
 UMIBuilder = Callable[[dict, Objective, str, int], UnifiedModelInterface]
 
@@ -36,3 +36,5 @@ builder_map: Dict[str, UMIBuilder] = {
     'mlp': build_mlp,
     'dense': build_mlp
 }
+
+builder_map.update(known_sklearn_models)
