@@ -2,12 +2,13 @@
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.model_selection import KFold, StratifiedKFold, TimeSeriesSplit
 from enum import Enum
-from typing import Union
+from typing import Union, Optional
 
 # %%
 
 
 class ScalerType(Enum):
+    NONE = 'none'
     MIN_MAX = 'minmax'
     STANDARD = 'standard'
 
@@ -25,7 +26,7 @@ Splitter = Union[KFold, StratifiedKFold, TimeSeriesSplit]
 
 class Preprocessing:
 
-    scaler: Scaler
+    scaler: Optional[Scaler]
     splitter: Splitter
 
     def __init__(self, scaler: ScalerType, splitter: SplitterType, kfold: int):
@@ -33,11 +34,13 @@ class Preprocessing:
         self.splitter = self._get_splitter(splitter, kfold)
 
     @staticmethod
-    def _get_scaler(t: ScalerType) -> Scaler:
+    def _get_scaler(t: ScalerType) -> Optional[Scaler]:
         if t == ScalerType.MIN_MAX:
             return MinMaxScaler()
         elif t == ScalerType.STANDARD:
             return StandardScaler()
+        elif t == ScalerType.NONE:
+            return None
         else:
             raise ValueError(f"Unknown scaler {t}")
 
@@ -53,6 +56,8 @@ class Preprocessing:
             raise ValueError(f"Unknown splitter {t}")
 
     def get_scaled(self, x, fit=True):
+        if self.scaler is None:
+            return x
         return self.scaler.fit_transform(x) if fit else self.scaler.transform(x)
 
     def get_split(self, x, y):
