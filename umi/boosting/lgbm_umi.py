@@ -3,7 +3,7 @@ from umi.base_umi import Objective
 from umi.boosting.boosting_umi import BoostingUMI
 
 
-class LgbUMI(BoostingUMI):
+class LgbmUMI(BoostingUMI):
     model: LGBMModel
 
     def _get_model_from_objective(self, objective: Objective, model_args: dict) -> LGBMModel:
