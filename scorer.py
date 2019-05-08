@@ -115,7 +115,7 @@ class Scorer:
         self.save_file = os.path.join(save_dir, f'{name}_score.csv')
         self._init_file(save_dir)
 
-    def _init_file(self, save_dir):
+    def _init_file(self, save_dir: str):
         if os.path.exists(self.save_file):
             self._load_history()
         else:
@@ -146,7 +146,7 @@ class Scorer:
         with open(self.save_file, 'a') as f:
             f.write(line)
 
-    def should_save(self, score: ScoreData):
+    def should_save(self, score: ScoreData) -> bool:
         if self.save_tactics == SaveTactics.ALL:
             return True
         elif self.save_tactics == SaveTactics.IMPROVE_OVER_PREV:
@@ -160,7 +160,7 @@ class Scorer:
         else:
             return False
 
-    def score(self, y_true, y_pred, name_only_keys=True, record_score=True) -> ScoreData:
+    def score(self, y_true, y_pred, name_only_keys: bool = True, record_score: bool = True) -> ScoreData:
         s = {m: m[1][0](y_true, y_pred) for m in self.metrics}
         if record_score:
             if self.should_save(s):
