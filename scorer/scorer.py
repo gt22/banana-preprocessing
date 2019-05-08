@@ -16,6 +16,7 @@ class MetricType(Enum):
 MetricFunction = Tuple[Callable[[Any, Any], float], MetricType]
 NamedMetric = Tuple[str, MetricFunction]
 ScoreData = Dict[NamedMetric, float]
+CleanScoreData = Dict[str, float]
 ImprovementCriterion = Callable[[ScoreData, ScoreData], bool]
 
 H = MetricType.HIGH
@@ -87,7 +88,7 @@ class SaveTactics(Enum):
 
 class Scorer:
     name: str
-    metrics: List[NamedMetric]
+    metrics: Dict[str, NamedMetric]
     criterion: ImprovementCriterion
     save_tactics: SaveTactics
     save_file: str
@@ -98,18 +99,20 @@ class Scorer:
     def __init__(self, name: str, metrics: List[Union[str, NamedMetric]],
                  improvement_criterion: Union[str, ImprovementCriterion] = 'any_improve',
                  save_tactics: SaveTactics = SaveTactics.NONE, save_dir: str = 'score'):
-        metrics = metrics.copy()
+        metrics_dict = {}
         for i, e in enumerate(metrics):
             if type(e) is str:
                 if e not in known_metrics:
                     raise NotImplementedError(f"Unknown metric '{e}'.")
-                metrics[i] = (e, known_metrics[e])
+                metrics_dict[e] = (e, known_metrics[e])
+            else:
+                metrics_dict[e[0]] = e
         if type(improvement_criterion) is str:
             if improvement_criterion not in known_criterions:
                 raise NotImplementedError(f"Unknown criterion '{improvement_criterion}'")
             improvement_criterion = known_criterions[improvement_criterion]
         self.name = name
-        self.metrics = metrics
+        self.metrics = metrics_dict
         self.criterion = improvement_criterion
         self.save_tactics = save_tactics
         self.save_file = os.path.join(save_dir, f'{name}_score.csv')
@@ -121,7 +124,7 @@ class Scorer:
         else:
             if not os.path.exists(save_dir):
                 os.makedirs(save_dir)
-            header = ','.join(n for n, _ in self.metrics) + '\n'
+            header = ','.join(n for n in self.metrics.keys()) + '\n'
             with open(self.save_file, 'w') as f:
                 f.write(header)
 
@@ -130,11 +133,14 @@ class Scorer:
         best_score = None
         with open(self.save_file) as f:
             name = f.readline()[:-1].split(',')
-            for i, n in enumerate(name):
-                if self.metrics[i][0] != n:
+
+            if len(name) != len(self.metrics):
+                raise ValueError(f"History file {self.save_file} doesn't match current metrics!")
+            for n in name:
+                if n not in self.metrics:
                     raise ValueError(f"History file {self.save_file} doesn't match current metrics!")
             for line in f.readlines():
-                score: ScoreData = dict(zip(self.metrics, [float(x) for x in line.split(',')]))
+                score: ScoreData = dict(zip(self.metrics.values(), [float(x) for x in line.split(',')]))
                 history.append(score)
                 if best_score is None or self.criterion(score, best_score):
                     best_score = score
@@ -160,16 +166,19 @@ class Scorer:
         else:
             return False
 
-    def record_score(self, s: ScoreData):
+    def record(self, s: ScoreData):
         if self.should_save(s):
             self.save(s)
         if self.best_score is None or self.criterion(s, self.best_score):
             self.best_score = s
         self.history.append(s)
 
-    def score(self, y_true, y_pred, name_only_keys: bool = True, record_score: bool = True) -> ScoreData:
-        s = {m: m[1][0](y_true, y_pred) for m in self.metrics}
+    def restore(self, named_scores: CleanScoreData) -> ScoreData:
+        return {self.metrics[n]: s for n, s in named_scores.items()}
+
+    def score(self, y_true, y_pred, clean: bool = True, record_score: bool = True) -> Union[ScoreData, CleanScoreData]:
+        s = {m: m[1][0](y_true, y_pred) for m in self.metrics.values()}
         if record_score:
-            self.record_score(s)
-        return {k[0]: v for k, v in s.items()} if name_only_keys else s
+            self.record(s)
+        return {k[0]: v for k, v in s.items()} if clean else s
 
