@@ -1,6 +1,6 @@
 # %%
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
-from sklearn.model_selection import KFold, StratifiedKFold, TimeSeriesSplit
+from sklearn.model_selection import KFold, StratifiedKFold, TimeSeriesSplit, ShuffleSplit, StratifiedShuffleSplit
 from enum import Enum
 from typing import Union, Optional
 
@@ -14,9 +14,11 @@ class ScalerType(Enum):
 
 
 class SplitterType(Enum):
-    NORMAL = 'kfold'
-    STRATIFIED = 'stratifiedkfold'
-    TIME_SERIES = 'timeserieskfold'
+    SHUFFLE = 'shuffle'
+    STRATIFIED_SHUFFLE = 'stratifiedshuffle'
+    KFOLD = 'kfold'
+    STRATIFIED_KFOLD = 'stratifiedkfold'
+    TIME_SERIES_KFOLD = 'timeserieskfold'
 
 
 # %%
@@ -46,11 +48,15 @@ class Preprocessing:
 
     @staticmethod
     def _get_splitter(t: SplitterType, n: int) -> Splitter:
-        if t == SplitterType.NORMAL:
+        if t == SplitterType.SHUFFLE:
+            return ShuffleSplit(n)
+        elif t == SplitterType.STRATIFIED_SHUFFLE:
+            return StratifiedShuffleSplit(n)
+        elif t == SplitterType.KFOLD:
             return KFold(n)
-        elif t == SplitterType.STRATIFIED:
+        elif t == SplitterType.STRATIFIED_KFOLD:
             return StratifiedKFold(n)
-        elif t == SplitterType.TIME_SERIES:
+        elif t == SplitterType.TIME_SERIES_KFOLD:
             return TimeSeriesSplit(n)
         else:
             raise ValueError(f"Unknown splitter {t}")
