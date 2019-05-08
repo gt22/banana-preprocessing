@@ -160,11 +160,13 @@ class Scorer:
         else:
             return False
 
-    def score(self, y_true, y_pred, name_only_keys=True) -> ScoreData:
+    def score(self, y_true, y_pred, name_only_keys=True, record_score=True) -> ScoreData:
         s = {m: m[1][0](y_true, y_pred) for m in self.metrics}
-        if self.should_save(s):
-            self.save(s)
-        if self.best_score is None or self.criterion(s, self.best_score):
-            self.best_score = s
-        self.history.append(s)
+        if record_score:
+            if self.should_save(s):
+                self.save(s)
+            if self.best_score is None or self.criterion(s, self.best_score):
+                self.best_score = s
+            self.history.append(s)
         return {k[0]: v for k, v in s.items()} if name_only_keys else s
+
