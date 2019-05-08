@@ -92,7 +92,7 @@ class Scorer:
     save_tactics: SaveTactics
     save_file: str
 
-    history: List[ScoreData] = None
+    history: List[ScoreData] = []
     best_score: ScoreData = None
 
     def __init__(self, name: str, metrics: List[Union[str, NamedMetric]],
