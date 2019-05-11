@@ -3,7 +3,7 @@ from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
 from sklearn.svm import SVC, SVR, LinearSVC, LinearSVR
 from umi.sklearn_umi import SklearnUMI
-from umi.base_umi import Objective
+from umi import Objective
 from typing import Dict, Type
 
 

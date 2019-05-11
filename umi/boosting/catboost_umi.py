@@ -1,5 +1,5 @@
 from catboost import CatBoost, CatBoostClassifier, CatBoostRegressor
-from umi.base_umi import Objective
+from umi import Objective
 from umi.boosting.boosting_umi import BoostingUMI
 
 

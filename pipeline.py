@@ -1,4 +1,4 @@
-from umi.base_umi import UnifiedModelInterface
+from umi import UnifiedModelInterface
 from preprocessing import Preprocessing
 from scorer.scorer import Scorer, CleanScoreData
 from typing import Optional, Union

@@ -1,4 +1,4 @@
-from umi.base_umi import UnifiedModelInterface, Objective
+from umi import UnifiedModelInterface, Objective
 from typing import Optional, List, Callable
 import os
 from keras.models import Sequential, save_model

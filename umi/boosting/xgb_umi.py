@@ -1,5 +1,5 @@
 from xgboost import XGBModel, XGBClassifier, XGBRegressor
-from umi.base_umi import Objective
+from umi import Objective
 from umi.boosting.boosting_umi import BoostingUMI
 
 

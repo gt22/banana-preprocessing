@@ -1,4 +1,4 @@
-from umi.base_umi import Objective
+from umi import Objective
 from umi.sklearn_umi import SklearnUMI
 from typing import Optional
 
