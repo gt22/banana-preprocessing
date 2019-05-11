@@ -37,4 +37,5 @@ builder_map: Dict[str, UMIBuilder] = {
     'dense': build_mlp
 }
 
-builder_map.update(known_sklearn_models)
+for n, m in known_sklearn_models.items():
+    builder_map[n] = m.builder

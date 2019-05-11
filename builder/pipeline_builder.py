@@ -10,7 +10,11 @@ config_example = {
     'name': 'cb_model',
     'preprocessing': {
         'scaler': 'minmax',
-        'kfold': 3
+        'splitter': 'shuffle',
+        'kfold': 3,
+        'splitter_args': {
+            'test_size': 0.3
+        }
     },
     'model': {
         'type': 'catboost',
@@ -33,7 +37,9 @@ def build_preprocessing(cfg: dict) -> Preprocessing:
     scaler = ScalerType(cfg.get('scaler', 'none'))
     splitter = SplitterType(cfg.get('splitter', 'kfold'))
     kfold = cfg.get('kfold', DEFAULT_KFOLD)
-    return Preprocessing(scaler, splitter, kfold)
+    scaler_args = cfg.get('scaler_args', {})
+    splitter_args = cfg.get('splitter_args')
+    return Preprocessing(scaler, splitter, kfold, scaler_args, splitter_args)
 
 
 def build_model(cfg: dict, objective: Objective, class_num: Optional[int], name: str) -> UnifiedModelInterface:

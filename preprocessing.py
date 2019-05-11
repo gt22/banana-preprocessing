@@ -23,7 +23,7 @@ class SplitterType(Enum):
 
 # %%
 Scaler = Union[StandardScaler, MinMaxScaler]
-Splitter = Union[KFold, StratifiedKFold, TimeSeriesSplit]
+Splitter = Union[ShuffleSplit, StratifiedShuffleSplit, KFold, StratifiedKFold, TimeSeriesSplit]
 
 
 class Preprocessing:
@@ -31,33 +31,33 @@ class Preprocessing:
     scaler: Optional[Scaler]
     splitter: Splitter
 
-    def __init__(self, scaler: ScalerType, splitter: SplitterType, kfold: int):
-        self.scaler = self._get_scaler(scaler)
-        self.splitter = self._get_splitter(splitter, kfold)
+    def __init__(self, scaler: ScalerType, splitter: SplitterType, kfold: int, scaler_args: dict, splitter_args: dict):
+        self.scaler = self._get_scaler(scaler, scaler_args)
+        self.splitter = self._get_splitter(splitter, kfold, splitter_args)
 
     @staticmethod
-    def _get_scaler(t: ScalerType) -> Optional[Scaler]:
+    def _get_scaler(t: ScalerType, args: dict) -> Optional[Scaler]:
         if t == ScalerType.MIN_MAX:
-            return MinMaxScaler()
+            return MinMaxScaler(**args)
         elif t == ScalerType.STANDARD:
-            return StandardScaler()
+            return StandardScaler(**args)
         elif t == ScalerType.NONE:
             return None
         else:
             raise ValueError(f"Unknown scaler {t}")
 
     @staticmethod
-    def _get_splitter(t: SplitterType, n: int) -> Splitter:
+    def _get_splitter(t: SplitterType, n: int, args: dict) -> Splitter:
         if t == SplitterType.SHUFFLE:
-            return ShuffleSplit(n)
+            return ShuffleSplit(n, **args)
         elif t == SplitterType.STRATIFIED_SHUFFLE:
-            return StratifiedShuffleSplit(n)
+            return StratifiedShuffleSplit(n, **args)
         elif t == SplitterType.KFOLD:
-            return KFold(n)
+            return KFold(n, **args)
         elif t == SplitterType.STRATIFIED_KFOLD:
-            return StratifiedKFold(n)
+            return StratifiedKFold(n, **args)
         elif t == SplitterType.TIME_SERIES_KFOLD:
-            return TimeSeriesSplit(n)
+            return TimeSeriesSplit(n, **args)
         else:
             raise ValueError(f"Unknown splitter {t}")
 
