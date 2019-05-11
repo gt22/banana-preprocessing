@@ -1,6 +1,6 @@
 from umi.base_umi import Objective, UnifiedModelInterface
-from typing import Dict, Callable
-from umi.sklearn_models import known_models as known_sklearn_models
+from typing import Dict, Callable, Type
+from umi.sklearn_models import known_models as known_sklearn_models, ModelClass
 
 UMIBuilder = Callable[[dict, Objective, str, int], UnifiedModelInterface]
 
@@ -25,6 +25,12 @@ def build_mlp(cfg: dict, objective: Objective, name: str, class_num: int) -> Uni
     return MlpUmi(objective, name, class_num=class_num, **cfg)
 
 
+def create_sklearn_builder(m: Type[ModelClass]) -> UMIBuilder:
+    def sklearn_builder(cfg: dict, objective: Objective, name: str, class_num: int) -> UnifiedModelInterface:
+        return m(objective, name, class_num, **cfg)
+    return sklearn_builder
+
+
 builder_map: Dict[str, UMIBuilder] = {
     'catboost': build_catboost,
     'cb': build_catboost,
@@ -38,4 +44,4 @@ builder_map: Dict[str, UMIBuilder] = {
 }
 
 for n, m in known_sklearn_models.items():
-    builder_map[n] = m.builder
+    builder_map[n] = create_sklearn_builder(m)
