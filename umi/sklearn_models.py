@@ -6,21 +6,32 @@ from umi.sklearn_umi import SklearnUMI
 from umi.base_umi import Objective
 from typing import Dict, Type
 
-known_models: Dict[str, Type[ModelClass]] = {}
+
+class _ModelClass(SklearnUMI):
+
+    def __init__(self, objective: Objective, model_name: str, **kwargs):
+        super().__init__(self.create_model(objective, **kwargs),
+                         model_name, objective=objective)
+
+    @classmethod
+    def builder(cls, cfg: dict, objective: Objective, model_name: str, class_num: int) -> _ModelClass:
+        return cls(objective, model_name, **cfg)
+
+    def create_model(self, objective: Objective, **kwargs):
+        raise NotImplementedError()
 
 
-def create_model_class(name: str, reg_model, cls_model):
-    class ModelClass(SklearnUMI):
+known_models: Dict[str, Type[_ModelClass]] = {}
 
-        def __init__(self, objective: Objective, model_name: str, **kwargs):
-            super().__init__(reg_model(**kwargs) if objective == Objective.REGRESSION else cls_model(**kwargs),
-                             model_name, objective=objective)
 
-        @classmethod
-        def builder(cls, cfg: dict, objective: Objective, model_name: str, class_num: int) -> ModelClass:
-            return cls(objective, model_name, **cfg)
-    known_models[name] = ModelClass
-    return ModelClass
+def create_model_class(name: str, reg_model, cls_model) -> Type[_ModelClass]:
+    class SubModelClass(_ModelClass):
+
+        def create_model(self, objective: Objective, **kwargs):
+            return (reg_model if objective == Objective.REGRESSION else cls_model)(**kwargs)
+
+    known_models[name] = SubModelClass
+    return SubModelClass
 
 
 LinearModelUMI = create_model_class('linear', LinearRegression, LogisticRegression)
