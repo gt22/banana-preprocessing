@@ -11,7 +11,7 @@ def mean_merger(scores: List[CleanScoreData]) -> CleanScoreData:
     tmp = defaultdict(list)
     for sc in scores:
         for k, v in sc.items():
-            tmp[k] += v
+            tmp[k].append(v)
     ret = {}
     for k in tmp:
         ret[k] = np.mean(tmp[k])

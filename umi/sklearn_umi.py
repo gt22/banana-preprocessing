@@ -31,19 +31,19 @@ class SklearnUMI(UnifiedModelInterface):
 
     def fit(self, x_train, y_train, x_val=None, y_val=None, **kwargs):
         if hasattr(self.model, 'fit'):
-            return self.model.fit(x_train, y_train)
+            return self.model.fit(x_train, y_train, **kwargs)
         else:
             raise NotImplementedError(f"Couldn't find 'fit' method on {self.model}, are you sure this is a model?")
 
     def predict(self, x, **kwargs):
         if hasattr(self.model, 'predict'):
-            return self.model.predict(x)
+            return self.model.predict(x, **kwargs)
         else:
             raise NotImplementedError(f"Couldn't find 'predict' method on {self.model}, are you sure this is a model?")
 
     def predict_proba(self, x, **kwargs):
         if hasattr(self.model, 'predict_proba'):
-            pred = self.model.predict_proba(x)
+            pred = self.model.predict_proba(x, **kwargs)
             if self.objective == Objective.CLASSIFICATION and pred.shape[1] == 2:
                 pred = pred[:, 1]
             return pred

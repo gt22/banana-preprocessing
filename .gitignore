@@ -1,3 +1,5 @@
 .idea
 __pycache__
-score_data
+score
+catboost_info
+data

@@ -31,6 +31,8 @@ class Preprocessing:
     scaler: Optional[Scaler]
     splitter: Splitter
 
+    # TODO: Cat features, encoders, resampling
+
     def __init__(self, scaler: ScalerType, splitter: SplitterType, kfold: int, scaler_args: dict, splitter_args: dict):
         self.scaler = self._get_scaler(scaler, scaler_args)
         self.splitter = self._get_splitter(splitter, kfold, splitter_args)

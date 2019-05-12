@@ -5,6 +5,10 @@ from builder.umi_builder import builder_map
 from scorer.scorer import Scorer, SaveTactics
 from pipeline import Pipeline
 
+# TODO: Gird/RandomSearch, hyper/bayesopt
+# TODO: Dim reduction
+# TODO: Ensembling
+
 config_example = {
     'objective': 'classification',
     'name': 'cb_model',
@@ -38,7 +42,7 @@ def build_preprocessing(cfg: dict) -> Preprocessing:
     splitter = SplitterType(cfg.get('splitter', 'kfold'))
     kfold = cfg.get('kfold', DEFAULT_KFOLD)
     scaler_args = cfg.get('scaler_args', {})
-    splitter_args = cfg.get('splitter_args')
+    splitter_args = cfg.get('splitter_args', {})
     return Preprocessing(scaler, splitter, kfold, scaler_args, splitter_args)
 
 
