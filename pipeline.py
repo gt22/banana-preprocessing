@@ -24,11 +24,11 @@ class Pipeline:
         if self.preproc is not None:
             x = self.preproc.get_scaled(x)
             scores = []
-            for train, val in self.preproc.get_split(x, y):
-                self.fit(x[train], y[train], x[val], y[val])
-                val_pred = self.predict(x[val])
+            for train_id, val_id in self.preproc.get_split(x, y):
+                self.fit(x[train_id], y[train_id], x[val_id], y[val_id])
+                val_pred = self.predict(x[val_id])
                 if self.scorer is not None:
-                    scores.append(self.scorer.score(y[val], val_pred, record_score=False))
+                    scores.append(self.scorer.score(y[val_id], val_pred, record_score=False))
             merged_score = self.score_merger(scores)
             if self.scorer is not None:
                 self.scorer.record(self.scorer.restore(merged_score))
