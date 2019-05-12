@@ -14,4 +14,3 @@ class XgbUMI(BoostingUMI):
             return XGBRegressor(**model_args)
         else:
             raise NotImplementedError("Unknown objective")
-

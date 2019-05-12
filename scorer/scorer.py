@@ -181,4 +181,3 @@ class Scorer:
         if record_score:
             self.record(s)
         return {k[0]: v for k, v in s.items()} if clean else s
-
