@@ -4,6 +4,7 @@ from math import sqrt
 import os
 from sklearn.metrics import accuracy_score, roc_auc_score, f1_score, \
     mean_absolute_error, mean_squared_error, mean_squared_log_error, r2_score, recall_score, precision_score
+import numpy as np
 
 
 class MetricType(Enum):
@@ -18,6 +19,12 @@ NamedMetric = Tuple[str, MetricFunction]
 ScoreData = Dict[NamedMetric, float]
 CleanScoreData = Dict[str, float]
 ImprovementCriterion = Callable[[ScoreData, ScoreData], bool]
+
+
+def class_metric_to_proba(metric: MetricFunction) -> MetricFunction:
+    f = metric[0]
+    return lambda y_true, y_pred: f(np.int_(y_true > 0.5), np.int_(y_pred > 0.5)), metric[1]
+
 
 H = MetricType.HIGH
 L = MetricType.LOW
@@ -35,6 +42,9 @@ known_metrics: Dict[str, MetricFunction] = {
     'r2': (r2_score, H)
 }
 del H, L
+class_metrics = ['accuracy', 'precision', 'recall', 'f1']
+for m in class_metrics:
+    known_metrics[f'{m}_proba'] = class_metric_to_proba(known_metrics[m])
 
 
 def compare_scores(a: float, b: float, m: MetricType, eps: float) -> int:
