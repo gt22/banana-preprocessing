@@ -1,32 +1,33 @@
-from umi.base_umi import Objective, UnifiedModelInterface
-from typing import Dict, Callable, Type
+from umi.base_umi import Objective, UnifiedModelInterface as UMI
+from typing import Dict, Callable, Type, Optional, List, Union
 from umi.sklearn_models import known_models as known_sklearn_models, ModelClass
 
-UMIBuilder = Callable[[dict, Objective, str, int], UnifiedModelInterface]
+CatFeatures = Optional[Union[List[str], List[int]]]
+UMIBuilder = Callable[[dict, Objective, str, int, CatFeatures], UMI]
 
 
-def build_catboost(cfg: dict, objective: Objective, name: str, class_num: int) -> UnifiedModelInterface:
+def build_catboost(cfg: dict, objective: Objective, name: str, class_num: int, cf: CatFeatures) -> UMI:
     from umi.boosting.catboost_umi import CatboostUMI
-    return CatboostUMI(objective, name, class_num, **cfg)
+    return CatboostUMI(objective, name, class_num, cf, **cfg)
 
 
-def build_lgbm(cfg: dict, objective: Objective, name: str, class_num: int) -> UnifiedModelInterface:
+def build_lgbm(cfg: dict, objective: Objective, name: str, class_num: int, cf: CatFeatures) -> UMI:
     from umi.boosting.lgbm_umi import LgbmUMI
-    return LgbmUMI(objective, name, class_num, **cfg)
+    return LgbmUMI(objective, name, class_num, cf, **cfg)
 
 
-def build_xgb(cfg: dict, objective: Objective, name: str, class_num: int) -> UnifiedModelInterface:
+def build_xgb(cfg: dict, objective: Objective, name: str, class_num: int, cf: CatFeatures) -> UMI:
     from umi.boosting.xgb_umi import XgbUMI
-    return XgbUMI(objective, name, class_num, **cfg)
+    return XgbUMI(objective, name, class_num, cf, **cfg)
 
 
-def build_mlp(cfg: dict, objective: Objective, name: str, class_num: int) -> UnifiedModelInterface:
+def build_mlp(cfg: dict, objective: Objective, name: str, class_num: int, cf: CatFeatures) -> UMI:
     from umi.neuro.mlp_umi import MlpUmi
     return MlpUmi(objective, name, class_num=class_num, **cfg)
 
 
 def create_sklearn_builder(m: Type[ModelClass]) -> UMIBuilder:
-    def sklearn_builder(cfg: dict, objective: Objective, name: str, class_num: int) -> UnifiedModelInterface:
+    def sklearn_builder(cfg: dict, objective: Objective, name: str, class_num: int, cf: CatFeatures) -> UMI:
         return m(objective, name, class_num, **cfg)
     return sklearn_builder
 

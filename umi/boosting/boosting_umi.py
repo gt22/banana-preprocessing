@@ -1,14 +1,15 @@
 from umi import Objective
 from umi.sklearn_umi import SklearnUMI
-from typing import Optional
+from typing import Optional, List, Union
 
 
 class BoostingUMI(SklearnUMI):
 
-    def __init__(self, objective: Objective, model_name: str, class_num: Optional[int] = None, model=None, **kwargs):
+    def __init__(self, objective: Objective, model_name: str, class_num: Optional[int] = None,
+                 cat_features: Optional[Union[List[str], List[int]]] = None, model=None, **kwargs):
         if model is None:
             model = self._get_model_from_objective(objective, kwargs)
-        super().__init__(model, model_name, class_num, objective)
+        super().__init__(model, model_name, class_num, cat_features, objective)
 
     def _get_model_from_objective(self, objective: Objective, model_args: dict):
         raise NotImplementedError("This class doesn't support inferring models. You should pass model into constructor")

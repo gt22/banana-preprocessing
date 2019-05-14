@@ -1,5 +1,5 @@
 from umi import UnifiedModelInterface, Objective
-from typing import Optional, Any
+from typing import Optional, Any, List, Union
 import pickle
 import os
 
@@ -8,10 +8,10 @@ class SklearnUMI(UnifiedModelInterface):
     model: Any
 
     def __init__(self, model, model_name: str, class_num: Optional[int] = None,
-                 objective: Optional[Objective] = None):
+                 cat_features: Optional[Union[List[str], List[int]]] = None, objective: Optional[Objective] = None):
         if objective is None:
             objective = self._get_objective_from_model(model)
-        super().__init__(objective, model_name, class_num)
+        super().__init__(objective, model_name, class_num, cat_features)
         self.model = model
 
     @staticmethod

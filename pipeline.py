@@ -3,6 +3,7 @@ from preprocessing import Preprocessing
 from scorer.scorer import Scorer, CleanScoreData
 from typing import Optional, Union
 from scorer.score_mergers import known_mergers, ScoreMerger
+from utils import index_entries as ind
 
 
 class Pipeline:
@@ -25,10 +26,11 @@ class Pipeline:
             x = self.preproc.get_scaled(x)
             scores = []
             for train_id, val_id in self.preproc.get_split(x, y):
-                self.fit(x[train_id], y[train_id], x[val_id], y[val_id])
-                val_pred = self.predict(x[val_id])
+                self.fit(ind(x, train_id, reset_index=True), ind(y, train_id, reset_index=True),
+                         ind(x, val_id, reset_index=True), ind(y, val_id, reset_index=True))
+                val_pred = self.predict(ind(x, val_id, reset_index=True))
                 if self.scorer is not None:
-                    scores.append(self.scorer.score(y[val_id], val_pred, record_score=False))
+                    scores.append(self.scorer.score(ind(y, val_id, reset_index=True), val_pred, record_score=False))
             merged_score = self.score_merger(scores)
             if self.scorer is not None:
                 self.scorer.record(self.scorer.restore(merged_score))

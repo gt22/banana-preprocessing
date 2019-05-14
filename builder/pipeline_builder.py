@@ -1,6 +1,6 @@
 from umi.base_umi import Objective, UnifiedModelInterface
 from preprocessing import Preprocessing, SplitterType, ScalerType
-from typing import Optional
+from typing import Optional, Union, List
 from builder.umi_builder import builder_map
 from scorer.scorer import Scorer, SaveTactics
 from pipeline import Pipeline
@@ -12,6 +12,7 @@ from pipeline import Pipeline
 config_example = {
     'objective': 'classification',
     'name': 'cb_model',
+    'cat_feaures': ['a', 's', 'd'],
     'preprocessing': {
         'scaler': 'minmax',
         'splitter': 'shuffle',
@@ -37,23 +38,24 @@ config_example = {
 DEFAULT_KFOLD = 5
 
 
-def build_preprocessing(cfg: dict) -> Preprocessing:
+def build_preprocessing(cfg: dict, cat_features: Optional[Union[List[str], List[int]]]) -> Preprocessing:
     scaler = ScalerType(cfg.get('scaler', 'none'))
     splitter = SplitterType(cfg.get('splitter', 'kfold'))
     kfold = cfg.get('kfold', DEFAULT_KFOLD)
     scaler_args = cfg.get('scaler_args', {})
     splitter_args = cfg.get('splitter_args', {})
-    return Preprocessing(scaler, splitter, kfold, scaler_args, splitter_args)
+    return Preprocessing(scaler, splitter, kfold, scaler_args, splitter_args, cat_features)
 
 
-def build_model(cfg: dict, objective: Objective, class_num: Optional[int], name: str) -> UnifiedModelInterface:
+def build_model(cfg: dict, objective: Objective, class_num: Optional[int], name: str,
+                cat_features: Optional[Union[List[str], List[int]]]) -> UnifiedModelInterface:
     model_type = cfg['type']
     if model_type not in builder_map:
         raise ValueError(f"Unknown type '{model_type}'")
     model_cfg = cfg.copy()
     model_cfg.pop('type')
     model_cfg.pop('name', None)
-    return builder_map[model_type](model_cfg, objective, name, class_num)
+    return builder_map[model_type](model_cfg, objective, name, class_num, cat_features)
 
 
 def build_scorer(cfg: dict, name: str) -> Scorer:
@@ -90,10 +92,10 @@ def build_pipeline(cfg: dict):
 
     name = cfg.get('name', cfg['model']['type'])
     class_num: Optional[int] = cfg.get('class_num', 2) if obj == Objective.CLASSIFICATION else None
-
+    cat_features = cfg.get('cat_features', None)
     pipeline_cfg = {
-        'preproc': build_preprocessing(cfg['preprocessing']) if 'preprocessing' in cfg else None,
-        'model': build_model(cfg['model'], obj, class_num, name),
+        'preproc': build_preprocessing(cfg['preprocessing'], cat_features) if 'preprocessing' in cfg else None,
+        'model': build_model(cfg['model'], obj, class_num, name, cat_features),
         'scorer': build_scorer(cfg['scorer'], name) if 'scorer' in cfg else None,
         'use_proba': cfg.get('use_proba', False)  # Can be absent only when regressing, and then it should be false
     }
