@@ -6,7 +6,7 @@ from scorer.scorer import ScoreData, CleanScoreData, ImprovementCriterion
 from typing import Tuple
 
 
-class RandomSearchOptimizer(Hyperoptimizer):
+class GridSearchOptimizer(Hyperoptimizer):
 
     def __init__(self, pipeline_conf, param_space: dict, n_iter: int, criterion: ImprovementCriterion):
         super().__init__(pipeline_conf)

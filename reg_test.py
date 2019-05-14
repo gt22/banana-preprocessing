@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
 from builder import build_pipeline
-from optimizer.randomsearch import RandomSearchOptimizer
+from optimizer.randomsearch import GridSearchOptimizer
 from scipy.stats.distributions import randint
 from scorer.scorer import any_improve_criterion
 # %%
@@ -65,7 +65,7 @@ pipeline_cfg = {
 param_space = {
         'iter_count': randint(10, 1000)
     }
-searcher = RandomSearchOptimizer(pipeline_cfg, param_space, 10, any_improve_criterion())
+searcher = GridSearchOptimizer(pipeline_cfg, param_space, 10, any_improve_criterion())
 # %%
 best_params, best_score = searcher.start_search(df.drop('SalePrice', axis=1), df['SalePrice'])
 # %%
