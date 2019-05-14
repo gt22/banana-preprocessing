@@ -78,7 +78,7 @@ class Preprocessing:
         if isinstance(self.cat_features[0], str):
             if not isinstance(x, DataFrame):
                 raise ValueError(f"Cat features are passes as names, but X is {type(x)}.\n"
-                                 "Named features are only avaivable with pandas DataFrame")
+                                 "Named features are only available with pandas DataFrame")
             cf = names_to_id(x, self.cat_features)
         else:
             cf = self.cat_features

@@ -3,7 +3,10 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
 from builder import build_pipeline
-# %#%
+from optimizer.randomsearch import RandomSearchOptimizer
+from scipy.stats.distributions import randint
+from scorer.scorer import any_improve_criterion
+# %%
 df = pd.read_csv("data/house-prices-advanced-regression-techniques/train.csv", index_col='Id')
 test_df = pd.read_csv("data/house-prices-advanced-regression-techniques/test.csv", index_col='Id')
 # %#%
@@ -36,26 +39,18 @@ for c in cat_features:
     test_df[c] = encoder.transform(test_df[c])
 # %#%
 df['SalePrice'] = np.log(df['SalePrice'])
-# %#%
-
-
-def names_to_id(n, d):
-    c = d.columns.tolist()
-    return [c.index(x) for x in n]
-
-
-# %#%
+# %%
 pipeline_cfg = {
     'objective': 'regression',
     'cat_features': cat_features,
     'preprocessing': {
         'scaler': 'standard',
-        'splitter': 'kfold',
-        'kfold': 3
+        'splitter': 'shuffle',
+        'kfold': 1
     },
     'model': {
         'type': 'catboost',
-        'iterations': 1000,
+        'iterations': '##iter_count',
         'eval_metric': 'RMSE',
         'random_seed': 6741,
         'use_best_model': True,
@@ -66,7 +61,14 @@ pipeline_cfg = {
         'save': 'iob'
     }
 }
-# %#%
+# %%
+param_space = {
+        'iter_count': randint(10, 1000)
+    }
+searcher = RandomSearchOptimizer(pipeline_cfg, param_space, 10, any_improve_criterion())
+# %%
+best_params, best_score = searcher.start_search(df.drop('SalePrice', axis=1), df['SalePrice'])
+# %%
 pipe = build_pipeline(pipeline_cfg)
 # %%
 score = pipe.run(df.drop('SalePrice', axis=1), df['SalePrice'])
@@ -79,3 +81,9 @@ if len(pipe.scorer.history) > 1:
     best = pipe.scorer.best_score[m]
     print(f'Best: {best}')
     print(f'Diff from best: {score["rmse"] - best}')
+# %%
+pred = pipe.predict(test_df)
+subm = pd.read_csv('data/house-prices-advanced-regression-techniques/sample_submission.csv')
+subm['SalePrice'] = pred
+# %%
+subm.to_csv('subm.csv', index=False, header=True)
