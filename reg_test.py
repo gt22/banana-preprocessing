@@ -46,11 +46,12 @@ pipeline_cfg = {
     'preprocessing': {
         'scaler': 'standard',
         'splitter': 'shuffle',
+        'encoder': 'onehot',
         'kfold': 1
     },
     'model': {
         'type': 'catboost',
-        'iterations': '##iter_count',
+        'iterations': '1000',
         'eval_metric': 'RMSE',
         'random_seed': 6741,
         'use_best_model': True,

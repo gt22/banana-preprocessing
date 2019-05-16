@@ -23,7 +23,7 @@ class Pipeline:
 
     def run(self, x, y) -> Optional[CleanScoreData]:
         if self.preproc is not None:
-            x = self.preproc.get_scaled(x)
+            x = self.preproc.preproc(x)
             scores = []
             for train_id, val_id in self.preproc.get_split(x, y):
                 self.fit(ind(x, train_id, reset_index=True), ind(y, train_id, reset_index=True),

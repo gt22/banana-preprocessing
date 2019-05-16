@@ -1,5 +1,5 @@
 from umi.base_umi import Objective, UnifiedModelInterface
-from preprocessing import Preprocessing, SplitterType, ScalerType
+from preprocessing import Preprocessing, SplitterType, ScalerType, EncoderType
 from typing import Optional, Union, List
 from builder.umi_builder import builder_map
 from scorer.scorer import Scorer, SaveTactics
@@ -41,10 +41,12 @@ DEFAULT_KFOLD = 5
 def build_preprocessing(cfg: dict, cat_features: Optional[Union[List[str], List[int]]]) -> Preprocessing:
     scaler = ScalerType(cfg.get('scaler', 'none'))
     splitter = SplitterType(cfg.get('splitter', 'kfold'))
+    encoder = EncoderType(cfg.get('encoder', 'none'))
     kfold = cfg.get('kfold', DEFAULT_KFOLD)
     scaler_args = cfg.get('scaler_args', {})
     splitter_args = cfg.get('splitter_args', {})
-    return Preprocessing(scaler, splitter, kfold, scaler_args, splitter_args, cat_features)
+    encoder_args = cfg.get('encoder_args', {})
+    return Preprocessing(scaler, splitter, kfold, encoder, scaler_args, splitter_args, encoder_args, cat_features)
 
 
 def build_model(cfg: dict, objective: Objective, class_num: Optional[int], name: str,

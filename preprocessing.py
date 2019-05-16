@@ -4,8 +4,11 @@ from sklearn.model_selection import KFold, StratifiedKFold, TimeSeriesSplit, Shu
 from enum import Enum
 from typing import Union, Optional, List
 import numpy as np
-from utils import names_to_id, index_data, update_data
+from utils import names_to_id, index_data, concatenate
 from pandas import DataFrame
+from sklearn.preprocessing import OneHotEncoder, LabelEncoder
+from scipy.sparse.base import issparse
+from scipy.sparse.csr import csr_matrix
 # %%
 
 
@@ -23,22 +26,31 @@ class SplitterType(Enum):
     TIME_SERIES_KFOLD = 'timeserieskfold'
 
 
+class EncoderType(Enum):
+    NONE = 'none'
+    ONE_HOT = 'onehot'
+
+
 # %%
 Scaler = Union[StandardScaler, MinMaxScaler]
 Splitter = Union[ShuffleSplit, StratifiedShuffleSplit, KFold, StratifiedKFold, TimeSeriesSplit]
+Encoder = Union[OneHotEncoder]
 
 
 class Preprocessing:
 
     scaler: Optional[Scaler]
     splitter: Splitter
+    encoder: Encoder
     cat_features: Optional[Union[List[str], List[int]]]
-    # TODO: encoders, resampling
+    # TODO: resampling
 
-    def __init__(self, scaler: ScalerType, splitter: SplitterType, kfold: int,
-                 scaler_args: dict, splitter_args: dict, cat_features: Optional[Union[List[str], List[int]]] = None):
+    def __init__(self, scaler: ScalerType, splitter: SplitterType, kfold: int, encoder: EncoderType,
+                 scaler_args: dict, splitter_args: dict, encoder_args: dict,
+                 cat_features: Optional[Union[List[str], List[int]]] = None):
         self.scaler = self._get_scaler(scaler, scaler_args)
         self.splitter = self._get_splitter(splitter, kfold, splitter_args)
+        self.encoder = self._get_encoder(encoder, encoder_args)
         self.cat_features = cat_features
 
     @staticmethod
@@ -67,6 +79,15 @@ class Preprocessing:
         else:
             raise ValueError(f"Unknown splitter {t}")
 
+    @staticmethod
+    def _get_encoder(t: EncoderType, args: dict) -> Optional[Encoder]:
+        if t == EncoderType.NONE:
+            return None
+        elif t == EncoderType.ONE_HOT:
+            return OneHotEncoder(**args)
+        else:
+            raise ValueError(f"Unknown encoder {t}")
+
     def _create_num_feature_index(self, x):
         if len(x.shape) <= 1:
             raise ValueError("Expected 2D array, got 1D array instead:\n"
@@ -88,18 +109,48 @@ class Preprocessing:
             ind[f] = False
         return ind
 
-    def get_scaled(self, x, fit=True, copy=True):
-        if copy:
-            x = x.copy()
+    def _encode(self, x_cat, fit: bool, sparse: Optional[bool]):
+        if self.encoder is None:
+            return x_cat
+        if isinstance(self.encoder, OneHotEncoder):
+            if fit:
+                self.encoder.fit(x_cat)
+            x_tran = self.encoder.transform(x_cat)
+            if sparse is True or (sparse is None and issparse(x_cat)):
+                return x_tran
+            if isinstance(x_cat, DataFrame):
+                return DataFrame(x_tran.toarray(), columns=self.encoder.get_feature_names(x_cat.columns))
+            else:
+                return x_tran.toarray()
+
+    def _scale(self, x_num, fit: bool, sparse):
         if self.scaler is None:
-            return x
-        num_ind = self._create_num_feature_index(x)
-        x_num = index_data(x, num_ind)
+            return x_num
         if fit:
             self.scaler.fit(x_num)
-        x_num = self.scaler.transform(x_num, copy=False)
-        update_data(x, num_ind, x_num)
-        return x
+        x_tran = self.scaler.transform(x_num, copy=False)
+        if sparse is True:
+            if issparse(x_num):
+                return type(x_num)(x_tran)
+            else:
+                return csr_matrix(x_tran)
+        elif sparse is None and issparse(x_num):
+            return type(x_num)(x_tran)
+        if isinstance(x_num, DataFrame):
+            return DataFrame(x_tran, columns=x_num.columns)
+        else:
+            return x_tran
 
+    def preproc(self, x, fit: bool=True, copy: bool=True, sparse: Optional[bool] = None):
+        if copy:
+            x = x.copy()
+
+        num_ind = self._create_num_feature_index(x)
+
+        x_num = self._scale(index_data(x, num_ind), fit, sparse)
+        x_cat = self._encode(index_data(x, ~num_ind), fit, sparse)
+
+        return concatenate(x_num, x_cat, axis=1)
+    
     def get_split(self, x, y):
         return self.splitter.split(x, y)
