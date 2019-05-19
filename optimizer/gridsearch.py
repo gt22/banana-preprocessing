@@ -8,7 +8,7 @@ from scorer.scorer import ScoreData, CleanScoreData, ImprovementCriterion
 from .hyperoptimizer import Hyperoptimizer
 
 
-class RandomSearchOptimizer(Hyperoptimizer):
+class GridSearchOptimizer(Hyperoptimizer):
 
     def __init__(self, pipeline_conf, param_space: dict, criterion: ImprovementCriterion):
         super().__init__(pipeline_conf)
