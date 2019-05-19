@@ -1,9 +1,10 @@
-from umi.base_umi import Objective, UnifiedModelInterface
-from preprocessing import Preprocessing, SplitterType, ScalerType, EncoderType
 from typing import Optional, Union, List
+
 from builder.umi_builder import builder_map
-from scorer.scorer import Scorer, SaveTactics
 from pipeline import Pipeline
+from preprocessing import Preprocessing, SplitterType, ScalerType, EncoderType
+from scorer.scorer import Scorer, SaveTactics
+from umi.base_umi import Objective, UnifiedModelInterface
 
 # TODO: Gird/RandomSearch, hyper/bayesopt
 # TODO: Dim reduction

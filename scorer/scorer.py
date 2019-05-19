@@ -1,10 +1,11 @@
-from typing import Callable, Union, List, Any, Dict, Tuple
+import os
 from enum import Enum
 from math import sqrt
-import os
+from typing import Callable, Union, List, Any, Dict, Tuple
+
+import numpy as np
 from sklearn.metrics import accuracy_score, roc_auc_score, f1_score, \
     mean_absolute_error, mean_squared_error, mean_squared_log_error, r2_score, recall_score, precision_score
-import numpy as np
 
 
 class MetricType(Enum):

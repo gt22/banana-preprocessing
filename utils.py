@@ -1,9 +1,10 @@
-from pandas import DataFrame, Series
 from typing import List
+
 import numpy as np
 import pandas as pd
-from scipy.sparse.base import issparse
+from pandas import DataFrame, Series
 from scipy.sparse import hstack, vstack
+from scipy.sparse.base import issparse
 
 
 def names_to_id(data: DataFrame, names: List[str]) -> List[int]:

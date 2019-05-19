@@ -1,8 +1,8 @@
 from catboost import CatBoost, CatBoostClassifier, CatBoostRegressor
+from pandas import DataFrame
+
 from umi import Objective
 from umi.boosting.boosting_umi import BoostingUMI
-from typing import List
-from pandas import DataFrame
 from utils import names_to_id
 
 

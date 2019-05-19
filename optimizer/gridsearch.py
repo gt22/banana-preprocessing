@@ -1,9 +1,11 @@
-from .hyperoptimizer import Hyperoptimizer
-from sklearn.model_selection import ParameterGrid
 from multiprocessing import Pool
+from typing import Tuple
+
+from sklearn.model_selection import ParameterGrid
+
 from builder import build_pipeline
 from scorer.scorer import ScoreData, CleanScoreData, ImprovementCriterion
-from typing import Tuple
+from .hyperoptimizer import Hyperoptimizer
 
 
 class RandomSearchOptimizer(Hyperoptimizer):

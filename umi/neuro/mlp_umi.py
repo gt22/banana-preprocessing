@@ -1,12 +1,14 @@
-from umi import UnifiedModelInterface, Objective
-from typing import Optional, List, Callable
 import os
-from keras.models import Sequential, save_model
-from keras.layers import Dense
-from keras import backend as K
-from keras.regularizers import Regularizer
-from keras.callbacks import Callback
+from typing import Optional, List, Callable
+
 import numpy as np
+from keras import backend as K
+from keras.callbacks import Callback
+from keras.layers import Dense
+from keras.models import Sequential, save_model
+from keras.regularizers import Regularizer
+
+from umi import UnifiedModelInterface, Objective
 
 
 class MlpUmi(UnifiedModelInterface):

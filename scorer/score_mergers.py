@@ -1,8 +1,9 @@
 from collections import defaultdict
 from typing import List, Callable, Dict
-import numpy as np
-from scorer.scorer import CleanScoreData
 
+import numpy as np
+
+from scorer.scorer import CleanScoreData
 
 ScoreMerger = Callable[[List[CleanScoreData]], CleanScoreData]
 

@@ -1,14 +1,18 @@
 # %%
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
-from sklearn.model_selection import KFold, StratifiedKFold, TimeSeriesSplit, ShuffleSplit, StratifiedShuffleSplit
 from enum import Enum
 from typing import Union, Optional, List
+
 import numpy as np
-from utils import names_to_id, index_data, concatenate
 from pandas import DataFrame
-from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 from scipy.sparse.base import issparse
 from scipy.sparse.csr import csr_matrix
+from sklearn.model_selection import KFold, StratifiedKFold, TimeSeriesSplit, ShuffleSplit, StratifiedShuffleSplit
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
+
+from utils import names_to_id, index_data, concatenate
+
+
 # %%
 
 

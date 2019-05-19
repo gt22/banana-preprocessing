@@ -1,10 +1,13 @@
 from __future__ import annotations
-from sklearn.linear_model import LinearRegression, LogisticRegression
-from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
-from sklearn.svm import SVC, SVR, LinearSVC, LinearSVR
-from umi.sklearn_umi import SklearnUMI
-from umi import Objective
+
 from typing import Dict, Type, Optional
+
+from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
+from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.svm import SVC, SVR, LinearSVC, LinearSVR
+
+from umi import Objective
+from umi.sklearn_umi import SklearnUMI
 
 
 class ModelClass(SklearnUMI):

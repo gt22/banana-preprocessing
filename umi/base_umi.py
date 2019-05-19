@@ -1,7 +1,7 @@
+import os
 from abc import ABC, abstractmethod
 from enum import Enum
 from typing import Optional, List, Union
-import os
 
 
 class Objective(Enum):

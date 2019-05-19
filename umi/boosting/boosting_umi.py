@@ -1,6 +1,7 @@
+from typing import Optional, List, Union
+
 from umi import Objective
 from umi.sklearn_umi import SklearnUMI
-from typing import Optional, List, Union
 
 
 class BoostingUMI(SklearnUMI):

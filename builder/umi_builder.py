@@ -1,5 +1,6 @@
-from umi.base_umi import Objective, UnifiedModelInterface as UMI
 from typing import Dict, Callable, Type, Optional, List, Union
+
+from umi.base_umi import Objective, UnifiedModelInterface as UMI
 from umi.sklearn_models import known_models as known_sklearn_models, ModelClass
 
 CatFeatures = Optional[Union[List[str], List[int]]]

@@ -1,8 +1,9 @@
-from umi import UnifiedModelInterface
-from preprocessing import Preprocessing
-from scorer.scorer import Scorer, CleanScoreData
 from typing import Optional, Union
+
+from preprocessing import Preprocessing
 from scorer.score_mergers import known_mergers, ScoreMerger
+from scorer.scorer import Scorer, CleanScoreData
+from umi import UnifiedModelInterface
 from utils import index_entries as ind
 
 

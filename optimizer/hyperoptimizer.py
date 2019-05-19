@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 from copy import deepcopy
-from scorer.scorer import ScoreData
 from typing import Tuple
+
+from scorer.scorer import ScoreData
 
 
 class Hyperoptimizer(ABC):

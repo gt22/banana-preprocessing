@@ -1,7 +1,8 @@
-from umi import UnifiedModelInterface, Objective
-from typing import Optional, Any, List, Union
-import pickle
 import os
+import pickle
+from typing import Optional, Any, List, Union
+
+from umi import UnifiedModelInterface, Objective
 
 
 class SklearnUMI(UnifiedModelInterface):
