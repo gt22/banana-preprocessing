@@ -54,7 +54,7 @@ def index_entries(x, ind, reset_index=False, copy=True):
             index_name = x.index.name
             x = x.reset_index()
             x = x.loc[ind, :]
-            x = x.set_index(index_name)
+            x = x.set_index(index_name if index_name is not None else 'index')
             return x
         else:
             return x.loc[ind, :]

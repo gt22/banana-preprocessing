@@ -42,23 +42,25 @@ for c in cat_features:
 # %#%
 df['SalePrice'] = np.log(df['SalePrice'])
 # %%
+model_conf = {
+        'type': 'catboost',
+        'iterations': 1000,
+        'eval_metric': 'RMSE',
+        'random_seed': 6741,
+        'use_best_model': True,
+        'verbose': True
+}
+# %%
 pipeline_cfg = {
     'objective': 'regression',
     'cat_features': cat_features,
     'preprocessing': {
         'scaler': 'standard',
         'splitter': 'shuffle',
-        'encoder': 'onehot',
+        'encoder': 'none',
         'kfold': 1
     },
-    'model': {
-        'type': 'catboost',
-        'iterations': '1000',
-        'eval_metric': 'RMSE',
-        'random_seed': 6741,
-        'use_best_model': True,
-        'verbose': True
-    },
+    'model': model_conf,
     'scorer': {
         'metrics': 'rmse',
         'save': 'iob'
@@ -67,7 +69,7 @@ pipeline_cfg = {
 # %%
 param_space = {
         'iter_count': randint(10, 1000)
-    }
+}
 searcher = RandomSearchOptimizer(pipeline_cfg, param_space, 10, any_improve_criterion())
 # %%
 best_params, best_score = searcher.start_search(df.drop('SalePrice', axis=1), df['SalePrice'])

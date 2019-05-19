@@ -123,7 +123,8 @@ class Preprocessing:
             if sparse is True or (sparse is None and issparse(x_cat)):
                 return x_tran
             if isinstance(x_cat, DataFrame):
-                return DataFrame(x_tran.toarray(), columns=self.encoder.get_feature_names(x_cat.columns))
+                return DataFrame(x_tran.toarray(), columns=self.encoder.get_feature_names(x_cat.columns),
+                                 index=x_cat.index)
             else:
                 return x_tran.toarray()
 
@@ -141,7 +142,7 @@ class Preprocessing:
         elif sparse is None and issparse(x_num):
             return type(x_num)(x_tran)
         if isinstance(x_num, DataFrame):
-            return DataFrame(x_tran, columns=x_num.columns)
+            return DataFrame(x_tran, columns=x_num.columns, index=x_num.index)
         else:
             return x_tran
 

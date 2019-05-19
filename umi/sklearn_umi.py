@@ -8,6 +8,7 @@ from umi import UnifiedModelInterface, Objective
 class SklearnUMI(UnifiedModelInterface):
     model: Any
 
+    # TODO: Remove inferring objective from model, replace with inferring model from objective.
     def __init__(self, model, model_name: str, class_num: Optional[int] = None,
                  cat_features: Optional[Union[List[str], List[int]]] = None, objective: Optional[Objective] = None):
         if objective is None:

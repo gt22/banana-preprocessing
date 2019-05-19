@@ -24,6 +24,8 @@ class UnifiedModelInterface(ABC):
         self.class_num = class_num
         self.cat_features = cat_features
 
+    # TODO: Move model-select method here
+
     @abstractmethod
     def fit(self, x_train, y_train, x_val, y_val, **kwargs):
         pass
