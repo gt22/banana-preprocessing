@@ -87,7 +87,7 @@ if len(pipe.scorer.history) > 1:
     print(f'Best: {best}')
     print(f'Diff from best: {score["rmse"] - best}')
 # %%
-pred = pipe.predict(test_df)
+pred = pipe.run_predict(test_df)
 subm = pd.read_csv('data/house-prices-advanced-regression-techniques/sample_submission.csv')
 subm['SalePrice'] = pred
 # %%
