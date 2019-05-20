@@ -8,10 +8,10 @@ class XgbUMI(BoostingUMI):
 
     model: XGBModel
 
-    def _get_model_from_objective(self, objective: Objective, model_args: dict) -> XGBModel:
-        if objective == Objective.CLASSIFICATION:
-            return XGBClassifier(**model_args)
-        elif objective == Objective.REGRESSION:
-            return XGBRegressor(**model_args)
+    def _initialize_model(self, **kwargs):
+        if self.objective == Objective.CLASSIFICATION:
+            self.model = XGBClassifier(**kwargs)
+        elif self.objective == Objective.REGRESSION:
+            self.model = XGBRegressor(**kwargs)
         else:
             raise NotImplementedError("Unknown objective")

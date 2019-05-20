@@ -7,13 +7,12 @@ from umi.sklearn_umi import SklearnUMI
 class BoostingUMI(SklearnUMI):
 
     def __init__(self, objective: Objective, model_name: str, class_num: Optional[int] = None,
-                 cat_features: Optional[Union[List[str], List[int]]] = None, model=None, **kwargs):
-        if model is None:
-            model = self._get_model_from_objective(objective, kwargs)
-        super().__init__(model, model_name, class_num, cat_features, objective)
+                 cat_features: Optional[Union[List[str], List[int]]] = None, **kwargs):
+        super().__init__(objective, model_name, class_num, cat_features, **kwargs)
 
-    def _get_model_from_objective(self, objective: Objective, model_args: dict):
-        raise NotImplementedError("This class doesn't support inferring models. You should pass model into constructor")
+    # For some reason, python gives warning when superclass implementation is just to throw NIE, so here is an override
+    def _initialize_model(self, **kwargs):
+        raise NotImplementedError("Model initialization is not defined for this class, use one of the subclasses")
 
     def fit(self, x_train, y_train, x_val=None, y_val=None, **kwargs):
         return super().fit(x_train, y_train, eval_set=(x_val, y_val) if x_val is not None else None)

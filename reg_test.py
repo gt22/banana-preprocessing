@@ -41,7 +41,7 @@ for c in cat_features:
     test_df[c] = encoder.transform(test_df[c])
 # %#%
 df['SalePrice'] = np.log(df['SalePrice'])
-# %%
+# %#%
 model_conf = {
         'type': 'catboost',
         'iterations': 1000,
@@ -50,7 +50,7 @@ model_conf = {
         'use_best_model': True,
         'verbose': True
 }
-# %%
+# %#%
 pipeline_cfg = {
     'objective': 'regression',
     'cat_features': cat_features,

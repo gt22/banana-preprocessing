@@ -1,8 +1,8 @@
 from typing import Dict, Callable, Type, Optional, List, Union
 
 from umi.base_umi import Objective, UnifiedModelInterface as UMI
-from umi.sklearn_models import known_models as known_sklearn_models, ModelClass
-
+from umi.sklearn_models import known_models as known_sklearn_models
+from umi.sklearn_umi import SklearnUMI
 CatFeatures = Optional[Union[List[str], List[int]]]
 UMIBuilder = Callable[[dict, Objective, str, int, CatFeatures], UMI]
 
@@ -27,7 +27,7 @@ def build_mlp(cfg: dict, objective: Objective, name: str, class_num: int, cf: Ca
     return MlpUmi(objective, name, class_num=class_num, **cfg)
 
 
-def create_sklearn_builder(m: Type[ModelClass]) -> UMIBuilder:
+def create_sklearn_builder(m: Type[SklearnUMI]) -> UMIBuilder:
     def sklearn_builder(cfg: dict, objective: Objective, name: str, class_num: int, cf: CatFeatures) -> UMI:
         return m(objective, name, class_num, **cfg)
     return sklearn_builder

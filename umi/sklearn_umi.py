@@ -8,28 +8,12 @@ from umi import UnifiedModelInterface, Objective
 class SklearnUMI(UnifiedModelInterface):
     model: Any
 
-    # TODO: Remove inferring objective from model, replace with inferring model from objective.
-    def __init__(self, model, model_name: str, class_num: Optional[int] = None,
-                 cat_features: Optional[Union[List[str], List[int]]] = None, objective: Optional[Objective] = None):
-        if objective is None:
-            objective = self._get_objective_from_model(model)
-        super().__init__(objective, model_name, class_num, cat_features)
-        self.model = model
+    def __init__(self, objective: Objective, model_name: str, class_num: Optional[int] = None,
+                 cat_features: Optional[Union[List[str], List[int]]] = None, **kwargs):
+        super().__init__(objective, model_name, class_num, cat_features, **kwargs)
 
-    @staticmethod
-    def _get_objective_from_model(model):
-        if hasattr(model, '_estimator_type'):
-            # noinspection PyProtectedMember
-            et = model._estimator_type
-            if et == 'classifier':
-                return Objective.CLASSIFICATION
-            elif et == 'regressor':
-                return Objective.REGRESSION
-            else:
-                raise NotImplementedError(f"Unknown _estimator_type '{et}', likely this model won't work with UMI."
-                                          f" Specify objective explicitly to try anyway.")
-        else:
-            raise ValueError(f"Couldn't find '_estimator_type' for {model}, please specify objective explicitly")
+    def _initialize_model(self, **kwargs):
+        raise NotImplementedError("Model initialization is not defined for this class, use one of the subclasses")
 
     def fit(self, x_train, y_train, x_val=None, y_val=None, **kwargs):
         if hasattr(self.model, 'fit'):

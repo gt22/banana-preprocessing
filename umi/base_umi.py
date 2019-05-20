@@ -16,15 +16,17 @@ class UnifiedModelInterface(ABC):
     cat_features: Optional[Union[List[str], List[int]]]
 
     def __init__(self, objective: Objective, model_name: str, class_num: Optional[int] = None,
-                 cat_features: Optional[Union[List[str], List[int]]] = None):
+                 cat_features: Optional[Union[List[str], List[int]]] = None, **kwargs):
         if objective != Objective.CLASSIFICATION and class_num is not None:
             raise ValueError("class_num should only be used with objective=CLASSIFICATION")
         self.objective = objective
         self.model_name = model_name
         self.class_num = class_num
         self.cat_features = cat_features
+        self._initialize_model(**kwargs)
 
-    # TODO: Move model-select method here
+    def _initialize_model(self, **kwargs):
+        pass
 
     @abstractmethod
     def fit(self, x_train, y_train, x_val, y_val, **kwargs):

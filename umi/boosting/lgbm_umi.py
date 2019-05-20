@@ -7,11 +7,11 @@ from umi.boosting.boosting_umi import BoostingUMI
 class LgbmUMI(BoostingUMI):
     model: LGBMModel
 
-    def _get_model_from_objective(self, objective: Objective, model_args: dict) -> LGBMModel:
-        if objective == Objective.CLASSIFICATION:
-            return LGBMClassifier(**model_args)
-        elif objective == Objective.REGRESSION:
-            return LGBMRegressor(**model_args)
+    def _initialize_model(self, **kwargs):
+        if self.objective == Objective.CLASSIFICATION:
+            self.model = LGBMClassifier(**kwargs)
+        elif self.objective == Objective.REGRESSION:
+            self.model = LGBMRegressor(**kwargs)
         else:
             raise NotImplementedError("Unknown objective")
 

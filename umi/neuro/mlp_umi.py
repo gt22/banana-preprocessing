@@ -53,6 +53,9 @@ class MlpUmi(UnifiedModelInterface):
         nn.compile(**compile_args)
         return nn
 
+    def _initialize_model(self, **kwargs):
+        pass  # Initialization is done using args from constructor
+
     def fit(self, x_train, y_train, x_val, y_val, **kwargs):
         if 'callbacks' not in kwargs:
             kwargs['callbacks'] = []
