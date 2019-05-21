@@ -15,4 +15,4 @@ class BoostingUMI(SklearnUMI):
         raise NotImplementedError("Model initialization is not defined for this class, use one of the subclasses")
 
     def fit(self, x_train, y_train, x_val=None, y_val=None, **kwargs):
-        return super().fit(x_train, y_train, eval_set=(x_val, y_val) if x_val is not None else None)
+        return super().fit(x_train, y_train, eval_set=(x_val, y_val) if x_val is not None else None, **kwargs)

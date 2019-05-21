@@ -6,7 +6,7 @@ from sklearn.model_selection import ParameterSampler
 from builder import build_pipeline
 from scorer.scorer import ScoreData, CleanScoreData, ImprovementCriterion
 from .hyperoptimizer import Hyperoptimizer
-
+from functools import partial
 
 class RandomSearchOptimizer(Hyperoptimizer):
 
@@ -33,8 +33,8 @@ class RandomSearchOptimizer(Hyperoptimizer):
                     best_params = params
             return best_params, best_score
         else:
-            pool = Pool(search_jobs)
-            score_data = pool.map(lambda p: self._check_params(x, y, p), self.searcher)
+            with Pool(search_jobs) as pool:
+                score_data = pool.map(partial(self._check_params, x, y), self.searcher)
             best_score = None
             best_params = None
             for s, p in score_data:

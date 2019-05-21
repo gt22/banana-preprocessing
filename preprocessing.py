@@ -99,7 +99,7 @@ class Preprocessing:
                              "Reshape your data either using array.reshape(-1, 1) if your data has a single feature "
                              "or array.reshape(1, -1) if it contains a single sample.")
         if self.cat_features is None or len(self.cat_features) == 0:
-            return x
+            return np.ones(x.shape[1], np.bool)
         if isinstance(self.cat_features[0], str):
             if not isinstance(x, DataFrame):
                 raise ValueError(f"Cat features are passes as names, but X is {type(x)}.\n"
