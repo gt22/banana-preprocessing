@@ -8,7 +8,6 @@ from umi.base_umi import Objective, UnifiedModelInterface
 
 # TODO: Gird/RandomSearch, hyper/bayesopt
 # TODO: Dim reduction
-# TODO: Ensembling
 
 config_example = {
     'objective': 'classification',
