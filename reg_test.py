@@ -32,7 +32,7 @@ for n in nans[nans > 0].index:
     test_df[n].fillna(f, inplace=True)
 # %#%
 cat_features = df.select_dtypes(include=['object']).columns.tolist() + \
-                ['MSSubClass', 'OverallQual', 'OverallCond']
+               ['MSSubClass', 'OverallQual', 'OverallCond']
 
 encoder = LabelEncoder()
 for c in cat_features:
@@ -41,16 +41,7 @@ for c in cat_features:
     test_df[c] = encoder.transform(test_df[c])
 # %#%
 df['SalePrice'] = np.log(df['SalePrice'])
-# %#%
-model_conf = {
-        'type': 'catboost',
-        'iterations': 1000,
-        'eval_metric': 'RMSE',
-        'random_seed': 6741,
-        'use_best_model': True,
-        'verbose': True
-}
-# %#%
+# %%
 pipeline_cfg = {
     'objective': 'regression',
     'cat_features': cat_features,
@@ -60,7 +51,25 @@ pipeline_cfg = {
         'encoder': 'none',
         'kfold': 1
     },
-    'model': model_conf,
+    'model': {
+        'type': 'ensemble',
+        'models': [
+            {
+                'type': 'catboost',
+                'iterations': 1000,
+                'eval_metric': 'RMSE',
+                'random_seed': 6741,
+                'use_best_model': True,
+                'verbose': True
+            },
+            {
+                'type': 'lgbm',
+                'n_estimators': 2000,
+                'verbose': 1
+            }
+        ],
+        'merger': 'median'
+    },
     'scorer': {
         'metrics': 'rmse',
         'save': 'iob'
@@ -68,7 +77,7 @@ pipeline_cfg = {
 }
 # %%
 param_space = {
-        'iter_count': randint(10, 1000)
+    'iter_count': randint(10, 1000)
 }
 searcher = RandomSearchOptimizer(pipeline_cfg, param_space, 10, any_improve_criterion())
 # %%
@@ -76,7 +85,9 @@ best_params, best_score = searcher.start_search(df.drop('SalePrice', axis=1), df
 # %%
 pipe = build_pipeline(pipeline_cfg)
 # %%
-score = pipe.run(df.drop('SalePrice', axis=1), df['SalePrice'])
+score = pipe.run(df.drop('SalePrice', axis=1), df['SalePrice'], fit_args={
+    'ensemble_n_jobs': 2
+})
 print(f"Cur: {score['rmse']}")
 if len(pipe.scorer.history) > 1:
     m = pipe.scorer.metrics['rmse']
